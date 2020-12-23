@@ -1,0 +1,6 @@
+notebooks/
+.idea/
+credentials.json
+token.pickle
+takeout*zip
+Takeout/
