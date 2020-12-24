@@ -49,21 +49,25 @@ class GMailBankApi:
         for msg in messages:
             msg_info = self._api.users().messages().get(userId='me', id=msg['id']).execute()
             msg_subj = next(x['value'] for x in msg_info['payload']['headers'] if x['name'] == 'Subject')
-            trans_type = next((t for t in trans_types if re.search(self._bc.MAIL_SUBJ.get(t, '(?!x)x'), msg_subj)), None)
-            if not trans_type:
+            possible_types = []
+            for trans_type in trans_types:
+                if re.search(self._bc.MAIL_SUBJ.get(trans_type, '(?!x)x'), msg_subj):
+                    # Some subjects are the same or very similar
+                    possible_types.append(trans_type)
+            if not possible_types:
                 # Subject does not match to any of transactions subjects
                 continue
-            mail_reg = self._bc.MAIL_REGEX[trans_type]
             if msg_info['payload']['body']['size'] > 0:
                 text = base64.urlsafe_b64decode(msg_info['payload']['body']['data']).decode()
             else:
                 text = msg_info['snippet']
-            match = re.search(mail_reg, text, re.DOTALL)
-            if not match:
-                # Mail's body does not contain regex
-                continue
-            amount = float(match.group(1).replace('.', ''))
-            transactions.append(Transaction(amount, trans_type))
+            for trans_type in trans_types:
+                mail_reg = self._bc.MAIL_REGEX[trans_type]
+                match = re.search(mail_reg, text, re.DOTALL)
+                if match:
+                    amount = float(match.group(1).replace('.', ''))
+                    transactions.append(Transaction(amount, trans_type))
+                    break
         return transactions
 
     def check_transactions(self, st_date: date=None, end_date: date=None) -> List[Transaction]:
