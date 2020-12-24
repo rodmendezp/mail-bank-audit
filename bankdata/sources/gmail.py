@@ -43,11 +43,13 @@ class GMailBankApi:
     def _get_transactions(self, gmail_filter: str, trans_types: List[TransType]) -> List[Transaction]:
         transactions = []
         result = self._api.users().messages().list(userId='me', q=gmail_filter).execute()
+        if result['resultSizeEstimate'] == 0:
+            return transactions
         messages = result['messages']
         for msg in messages:
             msg_info = self._api.users().messages().get(userId='me', id=msg['id']).execute()
             msg_subj = next(x['value'] for x in msg_info['payload']['headers'] if x['name'] == 'Subject')
-            trans_type = next(t for t in trans_types if re.search(self._bc.MAIL_SUBJ[t], msg_subj))
+            trans_type = next((t for t in trans_types if re.search(self._bc.MAIL_SUBJ.get(t, '(?!x)x'), msg_subj)), None)
             if not trans_type:
                 # Subject does not match to any of transactions subjects
                 continue
