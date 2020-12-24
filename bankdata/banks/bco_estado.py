@@ -11,7 +11,7 @@ MAIL_SUBJ = {
 }
 
 MAIL_REGEX = {
-    TransType.CHECK_TRANSFER: 'Monto transferido\:.+\<strong\>\$(\S+)\<\/strong\>',
+    TransType.CHECK_TRANSFER: 'Acabas de realizar una Transferencia.+Monto transferido\:.+\<strong\>\$(\S+)\<\/strong\>',
     TransType.CHECK_EXPENSE: 'compra .*por \$(\S+) en (.+) asociado a su tarjeta',
     TransType.CHECK_WITHDRAW: 'giro en .+ por \$(\S+) asociado a su tarjeta',
 }
