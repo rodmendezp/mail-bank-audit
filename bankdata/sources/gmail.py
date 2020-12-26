@@ -52,7 +52,7 @@ class GMailBankApi:
             possible_types = []
             for trans_type in trans_types:
                 if re.search(self._bc.MAIL_SUBJ.get(trans_type, '(?!x)x'), msg_subj):
-                    # Some subjects are the same or very similar
+                    # Some subjects are very similar
                     possible_types.append(trans_type)
             if not possible_types:
                 # Subject does not match to any of transactions subjects
