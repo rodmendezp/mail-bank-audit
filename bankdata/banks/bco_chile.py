@@ -16,7 +16,7 @@ MAIL_SUBJ = {
 
 MAIL_REGEX = {
     TransType.NAT_CRED_PAY: 'monto Nacional de \$(\S+) con cargo a su Cuenta Corriente',
-    TransType.INT_CRED_PAY: 'Monto Pagado\<\/td\>.+USD (\S+)\<\/td\>',
+    TransType.INT_CRED_PAY: 'Monto Pagado Pesos\<\/td\>.+\$ (\S+)\<\/td\>',
     TransType.CHECK_TRANSFER: 'Monto\<\/td\>.+\$(\S+)\<\/td\>',
     TransType.NAT_CRED_EXPENSE: 'Compra por \$(\S+) con T\.Crédito',
     TransType.INT_CRED_EXPENSE: 'Compra por US\$(\S+) con T\.Crédito',
