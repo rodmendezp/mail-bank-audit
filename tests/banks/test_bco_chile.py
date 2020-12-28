@@ -46,7 +46,7 @@ class TestRegex(TestCase):
             text = f.read()
         reg = MAIL_REGEX[TransType.INT_CRED_PAY]
         result = re.search(reg, text, re.DOTALL)
-        self.assertEqual(result.group(1), '18,87')
+        self.assertEqual(result.group(1), '13.698')
 
     def test_nat_cred_exp(self):
         file_path = os.path.join(self.resource_folder, 'nat_cred_exp.html')
