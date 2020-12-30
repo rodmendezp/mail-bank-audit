@@ -66,11 +66,11 @@ class GMailAttachmentBankApi(GMailBankApi):
             for trans_type in possible_types:
                 mail_reg = self._bc.MAIL_REGEX[trans_type]
                 match = re.search(mail_reg, text, re.DOTALL)
-                if match:
-                    # TODO: Better way to support US$ , and CLP$ .
-                    amount = float(match.group(1).replace('.', '').replace(',', '.'))
-                    transactions.append(Transaction(amount, trans_type))
-                    break
+                if not match:
+                    continue
+                t = Transaction.from_match(match, trans_type)
+                transactions.append(t)
+                break
         return transactions
 
     @staticmethod

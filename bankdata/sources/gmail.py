@@ -78,8 +78,8 @@ class GMailBankApi(GMailApi):
                 mail_reg = self._bc.MAIL_REGEX[trans_type]
                 match = re.search(mail_reg, text, re.DOTALL)
                 if match:
-                    amount = float(match.group(1).replace('.', ''))
-                    transactions.append(Transaction(amount, trans_type))
+                    t = Transaction.from_match(match, trans_type)
+                    transactions.append(t)
                     break
         return transactions
 

@@ -44,8 +44,8 @@ class GMailExportBankApi:
             if not match:
                 # Mail's body does not contain regex
                 continue
-            amount = float(match.group(1).replace('.', ''))
-            transactions.append(Transaction(amount, trans_type))
+            t = Transaction.from_match(match, trans_type)
+            transactions.append(t)
         return transactions
 
     def check_transactions(self, st_date: date=None, end_date: date=None) -> List[Transaction]:
