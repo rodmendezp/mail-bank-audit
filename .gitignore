@@ -1,4 +1,5 @@
-notebooks/
+**/.ipynb_checkpoints/
+**/__pycache__/
 .idea/
 credentials.json
 token.pickle
