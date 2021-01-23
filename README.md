@@ -21,6 +21,9 @@ data from gmail.
 | ---  | ------- |
 | Banco de Chile | Chile | 
 | Banco Estado   | Chile |
+| Banco Santander | Chile
+| Scotiabank     | Chile |
+
 
 To include a new bank add it to `Bank(Enum)` in `mailbankdata\banks\__init__.py`
 and its name must match a new file in `mailbankdata\banks\bank_name.py` (lower case).  
