@@ -6,8 +6,8 @@ EMAIL = 'bancoestado.cl'
 
 MAIL_SUBJ = {
     TransType.CHECK_TRANSFER: 'Aviso de Transferencia de Fondos',
-    TransType.CHECK_EXPENSE: 'Notificacion de compra',
-    TransType.CHECK_WITHDRAW: 'Notificacion de giro',
+    TransType.CHECK_EXPENSE: 'Notificación de compra',
+    TransType.CHECK_WITHDRAW: 'Notificación de giro',
 }
 
 MAIL_REGEX = {
