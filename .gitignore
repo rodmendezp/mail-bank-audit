@@ -2,6 +2,6 @@
 **/__pycache__/
 .idea/
 credentials.json
-token.pickle
 takeout*zip
 Takeout/
+**/token.pickle
