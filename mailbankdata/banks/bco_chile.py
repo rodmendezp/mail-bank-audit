@@ -1,4 +1,4 @@
-import bankdata.core.constants as consts
+import mailbankdata.core.constants as consts
 
 TransType = consts.TransactionType
 

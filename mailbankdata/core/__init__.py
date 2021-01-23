@@ -1,5 +1,5 @@
 from typing import Match
-from bankdata.core.constants import TransactionType
+from mailbankdata.core.constants import TransactionType
 
 
 class Transaction:

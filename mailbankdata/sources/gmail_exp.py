@@ -6,9 +6,9 @@ import importlib
 import dateutil.parser
 from datetime import date
 from typing import List, Dict
-from bankdata.banks import Bank
-from bankdata.core import Transaction
-from bankdata.core.constants import TransactionType as TransType
+from mailbankdata.banks import Bank
+from mailbankdata.core import Transaction
+from mailbankdata.core.constants import TransactionType as TransType
 
 
 class GMailExportBankApi:

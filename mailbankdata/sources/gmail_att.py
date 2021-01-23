@@ -2,11 +2,11 @@ import re
 import html
 import base64
 from datetime import date
-from bankdata.banks import Bank
+from mailbankdata.banks import Bank
 from typing import List, Dict, Any
-from bankdata.core import Transaction
-from bankdata.sources.gmail import GMailBankApi
-from bankdata.core.constants import TransactionType as TransType
+from mailbankdata.core import Transaction
+from mailbankdata.sources.gmail import GMailBankApi
+from mailbankdata.core.constants import TransactionType as TransType
 
 
 class GMailAttachmentBankApi(GMailBankApi):

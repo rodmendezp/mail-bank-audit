@@ -4,12 +4,12 @@ import pickle
 import importlib
 from typing import List
 from datetime import date
-from bankdata.banks import Bank
-from bankdata.core import Transaction
+from mailbankdata.banks import Bank
+from mailbankdata.core import Transaction
 from googleapiclient.discovery import build
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
-from bankdata.core.constants import TransactionType as TransType
+from mailbankdata.core.constants import TransactionType as TransType
 
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
 

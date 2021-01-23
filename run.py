@@ -1,6 +1,6 @@
 from datetime import date
-from bankdata.banks import Bank
-from bankdata.sources import GMailBankApi, GMailExportBankApi, GMailAttachmentBankApi
+from mailbankdata.banks import Bank
+from mailbankdata.sources import GMailBankApi, GMailExportBankApi, GMailAttachmentBankApi
 
 
 if __name__ == '__main__':

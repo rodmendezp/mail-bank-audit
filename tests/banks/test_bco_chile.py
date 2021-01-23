@@ -1,8 +1,8 @@
 import os
 import re
 from unittest import TestCase
-from bankdata.banks.bco_chile import MAIL_REGEX
-from bankdata.core.constants import TransactionType as TransType
+from mailbankdata.banks.bco_chile import MAIL_REGEX
+from mailbankdata.core.constants import TransactionType as TransType
 
 
 class TestRegex(TestCase):
