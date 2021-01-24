@@ -82,11 +82,11 @@ class GMailExportBankApi:
 
     @staticmethod
     def pass_filters(msg, filters: Dict) -> bool:
-        msg_from = re.search('.+\@(\S+)', msg['from']).group(1)
+        msg_from = re.search(r'.+@(\S+)', msg['from']).group(1)
         msg_from = msg_from.replace('>', '')
         if msg_from != filters['from']:
             return False
-        msg_date = re.search('(.+)\d{2}\:\d{2}\:\d{2}', msg['date']).group(1)
+        msg_date = re.search(r'(.+)\d{2}:\d{2}:\d{2}', msg['date']).group(1)
         msg_date = parser.parse(msg_date).date()
         after, before = filters.get('after', date.min), filters.get('before', date.max)
         if not after <= msg_date < before:
