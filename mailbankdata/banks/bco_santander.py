@@ -10,5 +10,5 @@ MAIL_SUBJ = {
 
 MAIL_REGEX = {
   TransType.CHECK_TRANSFER:
-    'Monto de Transferencia\:[^$]*\$ (\S+)\.\-',
+    r'Monto de Transferencia\:[^$]*\$ (?P<nat>\S+)\.\-',
 }

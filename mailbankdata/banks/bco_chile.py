@@ -16,19 +16,19 @@ MAIL_SUBJ = {
 
 MAIL_REGEX = {
     TransType.NAT_CRED_PAY:
-        'monto Nacional de \$(?P<nat>\S+) con cargo a su Cuenta Corriente',
+        r'monto Nacional de \$(?P<nat>\S+) con cargo a su Cuenta Corriente',
     TransType.INT_CRED_PAY:
-        'Tipo de Cambio[^$]*\$ (?P<rate>\S+)\<\/td\>.+'
-        'Monto Pagado\<\/td\>.+?(?=USD)USD (?P<int>\S+)\<\/td\>.+'
-        'Monto Pagado Pesos\<\/td\>[^$]*\$ (?P<nat>\S+)\<\/td\>',
+        r'Tipo de Cambio[^$]*\$ (?P<rate>\S+)\<\/td\>.+'
+        r'Monto Pagado\<\/td\>.+?(?=USD)USD (?P<int>\S+)\<\/td\>.+'
+        r'Monto Pagado Pesos\<\/td\>[^$]*\$ (?P<nat>\S+)\<\/td\>',
     TransType.CHECK_TRANSFER:
-        'Monto\<\/td\>[^$]*\$(?P<nat>\S+)\<\/td\>',
+        r'Monto\<\/td\>[^$]*\$(?P<nat>\S+)\<\/td\>',
     TransType.NAT_CRED_EXPENSE:
-        'Compra por \$(?P<nat>\S+) con T\.Crédito',
+        r'Compra por \$(?P<nat>\S+) con T\.Crédito',
     TransType.INT_CRED_EXPENSE:
-        'Compra por US\$(?P<int>\S+) con T\.Crédito',
+        r'Compra por US\$(?P<int>\S+) con T\.Crédito',
     TransType.CHECK_EXPENSE:
-        'Compra por \$(?P<nat>\S+) con cargo a Cuenta',
+        r'Compra por \$(?P<nat>\S+) con cargo a Cuenta',
     TransType.CHECK_WITHDRAW:
-        'Giro en Cajero por \$(?P<nat>\S+) con cargo a Cuenta'
+        r'Giro en Cajero por \$(?P<nat>\S+) con cargo a Cuenta'
 }

@@ -10,6 +10,6 @@ MAIL_SUBJ = {
 
 MAIL_REGEX = {
     TransType.CHECK_EXPENSE:
-        'Monto pagado\<\/span\>[^$]*\$ (?P<nat>\S+)\<\/span\>',
+        r'Monto pagado\<\/span\>[^$]*\$ (?P<nat>\S+)\<\/span\>',
 
 }
