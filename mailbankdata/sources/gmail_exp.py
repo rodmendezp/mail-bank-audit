@@ -3,9 +3,9 @@ import email
 import zipfile
 import mailbox
 import importlib
-import dateutil.parser
 from datetime import date
-from typing import List, Dict
+from dateutil import parser
+from typing import List, Dict, Any
 from mailbankdata.banks import Bank
 from mailbankdata.core import Transaction
 from mailbankdata.core.constants import TransactionType as TransType
@@ -44,11 +44,13 @@ class GMailExportBankApi:
             if not match:
                 # Mail's body does not contain regex
                 continue
-            t = Transaction.from_match(match, trans_type)
+            mail_dtime = next(x[1] for x in msg._headers if x[0] == 'Date')
+            mail_dtime = parser.parse(mail_dtime).replace(tzinfo=None)
+            t = Transaction.from_match(match, mail_dtime, trans_type)
             transactions.append(t)
         return transactions
 
-    def check_transactions(self, st_date: date=None, end_date: date=None) -> List[Transaction]:
+    def check_transactions(self, st_date: date = None, end_date: date = None) -> List[Transaction]:
         trans_types = [
             TransType.NAT_CRED_PAY,
             TransType.INT_CRED_PAY,
@@ -59,7 +61,7 @@ class GMailExportBankApi:
         filters = self.generate_filters(self._bc.EMAIL, st_date, end_date)
         return self._get_transactions(filters, trans_types)
 
-    def credit_transactions(self, st_date: date=None, end_date: date=None) -> List[Transaction]:
+    def credit_transactions(self, st_date: date = None, end_date: date = None) -> List[Transaction]:
         trans_types = [
             TransType.NAT_CRED_PAY,
             TransType.NAT_CRED_EXPENSE
@@ -68,7 +70,7 @@ class GMailExportBankApi:
         return self._get_transactions(filters, trans_types)
 
     @staticmethod
-    def generate_filters(from_: str, st_date: date, end_date: date) -> str:
+    def generate_filters(from_: str, st_date: date, end_date: date) -> Dict[str, Any]:
         filters = {
             'from': from_,
         }
@@ -85,7 +87,7 @@ class GMailExportBankApi:
         if msg_from != filters['from']:
             return False
         msg_date = re.search('(.+)\d{2}\:\d{2}\:\d{2}', msg['date']).group(1)
-        msg_date = dateutil.parser.parse(msg_date).date()
+        msg_date = parser.parse(msg_date).date()
         after, before = filters.get('after', date.min), filters.get('before', date.max)
         if not after <= msg_date < before:
             return False
