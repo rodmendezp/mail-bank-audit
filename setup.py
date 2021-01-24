@@ -3,6 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='mailbankdata',
+    version='0.0.1',
     author='Rodrigo Mendez',
     author_email='rodmendezp@gmail.com',
     description='Retrieve bank transactions data from mails',
