@@ -32,6 +32,6 @@ class Transaction:
         if 'int' in groups_dict:
             kwargs['int_amount'] = float(groups_dict['int'].replace(',', '.'))
         if 'rate' in groups_dict:
-            kwargs['rate'] = float(groups_dict.get('rate', None).replace('.', '').replace(',', '.'))
+            kwargs['rate'] = float(groups_dict['rate'].replace('.', '').replace(',', '.'))
         transaction.__init__(**kwargs)
         return transaction
