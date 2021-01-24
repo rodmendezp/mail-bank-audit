@@ -15,7 +15,7 @@ class GMailExportBankApi:
     def __init__(self, zip_file: str, bank: Bank) -> None:
         self._bank = bank
         self._zip_file = zip_file
-        self._bc = importlib.import_module(f'bankdata.banks.{bank.name.lower()}')
+        self._bc = importlib.import_module(f'mailbankdata.banks.{bank.name.lower()}')
         self._extract_mbox()
 
     def _extract_mbox(self):

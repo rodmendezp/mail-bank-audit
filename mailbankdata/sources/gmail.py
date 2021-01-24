@@ -37,7 +37,7 @@ class GMailBankApi(GMailApi):
     def __init__(self, api, bank: Bank) -> None:
         super().__init__(api)
         self._bank = bank
-        self._bc = importlib.import_module(f'bankdata.banks.{bank.name.lower()}')
+        self._bc = importlib.import_module(f'mailbankdata.banks.{bank.name.lower()}')
 
     @classmethod
     def from_creds_json(cls, creds_path: str, bank: Bank) -> 'GMailBankApi':
