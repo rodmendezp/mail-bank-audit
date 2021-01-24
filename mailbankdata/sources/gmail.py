@@ -4,6 +4,7 @@ import pickle
 import importlib
 from typing import List
 from datetime import date
+from dateutil import parser
 from mailbankdata.banks import Bank
 from mailbankdata.core import Transaction
 from googleapiclient.discovery import build
@@ -73,17 +74,19 @@ class GMailBankApi(GMailApi):
             if msg_info['payload']['body']['size'] > 0:
                 text = base64.urlsafe_b64decode(msg_info['payload']['body']['data']).decode()
             else:
-                text = msg_info['snippet']
+                text = base64.urlsafe_b64decode(msg_info['payload']['parts'][0]['body']['data']).decode()
+            mail_dtime = next(x['value'] for x in msg_info['payload']['headers'] if x['name'] == 'Date')
+            mail_dtime = parser.parse(mail_dtime).replace(tzinfo=None)
             for trans_type in possible_types:
                 mail_reg = self._bc.MAIL_REGEX[trans_type]
                 match = re.search(mail_reg, text, re.DOTALL)
                 if match:
-                    t = Transaction.from_match(match, trans_type)
+                    t = Transaction.from_match(match, mail_dtime, trans_type)
                     transactions.append(t)
                     break
         return transactions
 
-    def check_transactions(self, st_date: date=None, end_date: date=None) -> List[Transaction]:
+    def check_transactions(self, st_date: date = None, end_date: date = None) -> List[Transaction]:
         trans_types = [
             TransType.NAT_CRED_PAY,
             TransType.INT_CRED_PAY,
@@ -94,7 +97,7 @@ class GMailBankApi(GMailApi):
         filters = self.generate_filters(self._bc.EMAIL, st_date, end_date)
         return self._get_transactions(filters, trans_types)
 
-    def credit_transactions(self, st_date: date=None, end_date: date=None) -> List[Transaction]:
+    def credit_transactions(self, st_date: date = None, end_date: date = None) -> List[Transaction]:
         trans_types = [
             TransType.NAT_CRED_PAY,
             TransType.NAT_CRED_EXPENSE
@@ -102,7 +105,7 @@ class GMailBankApi(GMailApi):
         filters = self.generate_filters(self._bc.EMAIL, st_date, end_date)
         return self._get_transactions(filters, trans_types)
 
-    def int_credit_transactions(self, st_date: date=None, end_date: date=None) -> List[Transaction]:
+    def int_credit_transactions(self, st_date: date = None, end_date: date = None) -> List[Transaction]:
         trans_types = [
             TransType.INT_CRED_PAY,
             TransType.INT_CRED_EXPENSE
