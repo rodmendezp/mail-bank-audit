@@ -1,4 +1,5 @@
 import re
+import html
 import base64
 import pickle
 import importlib
@@ -75,6 +76,7 @@ class GMailBankApi(GMailApi):
                 text = base64.urlsafe_b64decode(msg_info['payload']['body']['data']).decode()
             else:
                 text = base64.urlsafe_b64decode(msg_info['payload']['parts'][0]['body']['data']).decode()
+            text = html.unescape(text)
             mail_dtime = next(x['value'] for x in msg_info['payload']['headers'] if x['name'] == 'Date')
             mail_dtime = parser.parse(mail_dtime).replace(tzinfo=None)
             for trans_type in possible_types:
@@ -85,6 +87,11 @@ class GMailBankApi(GMailApi):
                     transactions.append(t)
                     break
         return transactions
+
+    def all_transactions(self, st_date: date = None, end_date: date = None) -> List[Transaction]:
+        trans_types = list(TransType)
+        filters = self.generate_filters(self._bc.EMAIL, st_date, end_date)
+        return self._get_transactions(filters, trans_types)
 
     def check_transactions(self, st_date: date = None, end_date: date = None) -> List[Transaction]:
         trans_types = [
