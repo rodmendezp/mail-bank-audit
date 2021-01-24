@@ -14,7 +14,7 @@ class Transaction:
 
     def __repr__(self) -> str:
         if self.rate:
-            return '(%s, %s, %s, USD %s (%s))' % (self.mail_dtime, self.ttype, self.amount, self.int_amount, self.rate)
+            return '(%s, %s, %s, USD %s (%s))' % (self.mail_dtime, self.ttype.name, self.amount, self.int_amount, self.rate)
         if self.int_amount:
             return '(%s, %s, USD %s)' % (self.mail_dtime, self.ttype.name, self.int_amount)
         return '(%s, %s, %s)' % (self.mail_dtime, self.ttype.name, self.amount)
