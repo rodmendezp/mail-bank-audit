@@ -30,7 +30,7 @@ class Transaction:
         if 'nat' in groups_dict:
             kwargs['amount'] = float(groups_dict['nat'].replace('.', '').replace(',', '.'))
         if 'int' in groups_dict:
-            kwargs['int_amount'] = float(groups_dict['int'].replace(',', '.'))
+            kwargs['int_amount'] = float(groups_dict['int'].replace('.', '').replace(',', '.'))
         if 'rate' in groups_dict:
             kwargs['rate'] = float(groups_dict['rate'].replace('.', '').replace(',', '.'))
         transaction.__init__(**kwargs)
