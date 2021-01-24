@@ -2,6 +2,7 @@ import re
 import html
 import base64
 from datetime import date
+from dateutil import parser
 from mailbankdata.banks import Bank
 from typing import List, Dict, Any
 from mailbankdata.core import Transaction
@@ -63,12 +64,14 @@ class GMailAttachmentBankApi(GMailBankApi):
             file_data = base64.urlsafe_b64decode(data)
             # TODO: Get message body
             text = html.unescape(file_data.decode())
+            mail_dtime = re.search(r'Date\: ([^\n]*)', text).group(1)
+            mail_dtime = parser.parse(mail_dtime).replace(tzinfo=None)
             for trans_type in possible_types:
                 mail_reg = self._bc.MAIL_REGEX[trans_type]
                 match = re.search(mail_reg, text, re.DOTALL)
                 if not match:
                     continue
-                t = Transaction.from_match(match, trans_type)
+                t = Transaction.from_match(match, mail_dtime, trans_type)
                 transactions.append(t)
                 break
         return transactions
