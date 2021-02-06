@@ -1,4 +1,4 @@
-# Mail Bank Audit
+# Mail Bank Data ![buidl](https://github.com/rodmendezp/mail-bank-audit/workflows/build/badge.svg)
 
 **Mail Bank Audit** is a python package that can go through
 your emails and check your bank transactions.  
