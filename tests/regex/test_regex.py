@@ -5,6 +5,7 @@ import mailbankdata.core.constants as consts
 
 TransType = consts.TransactionType
 
+
 class TestRegex(TestCase):
     banks_modules = []
     trans_groups = {
