@@ -5,6 +5,8 @@ from mailbankdata.core.constants import TransactionType as TransType
 
 class Transaction:
     def __init__(self, ttype: TransType, mail_dtime: datetime, amount=None, int_amount=None, rate=None) -> None:
+        if amount is None and int_amount is None:
+            raise AttributeError('amount or int_amount must be not None')
         self.amount = amount
         self.int_amount = int_amount
         self.rate = rate
