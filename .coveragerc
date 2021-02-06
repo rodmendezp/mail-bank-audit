@@ -1,0 +1,7 @@
+[run]
+branch = False
+source = mailbankdata
+
+[report]
+omit =
+    tests/*

@@ -8,4 +8,8 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: 3.9.0
+      - name: Run Coverage
+        run: |
+          pip install coverage
+          coverage run run_tests
       - run: python run_tests.py
