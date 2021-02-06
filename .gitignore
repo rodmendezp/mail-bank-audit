@@ -1,8 +1,15 @@
 **/.ipynb_checkpoints/
 **/__pycache__/
 .idea/
+
+examples/Tests.ipynb
+
+# gmail credential & data
 credentials.json
 **/token.pickle
 takeout*zip
 Takeout/
-examples/Tests.ipynb
+
+# coverage
+.coverage
+htmlcov/
