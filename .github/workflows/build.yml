@@ -1,4 +1,4 @@
-name: learn-github-actions
+name: build
 on: [push]
 jobs:
   unit-test:
@@ -13,4 +13,4 @@ jobs:
           pip install coverage
           coverage run run_tests.py
           coverage report
-      - run: python run_tests.py
+      - run: python setup.py sdist
