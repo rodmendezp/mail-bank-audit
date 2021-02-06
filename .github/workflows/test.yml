@@ -11,5 +11,5 @@ jobs:
       - name: Run Coverage
         run: |
           pip install coverage
-          coverage run run_tests
+          coverage run run_tests.py
       - run: python run_tests.py
