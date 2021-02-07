@@ -61,13 +61,6 @@ class GMailBankApi(GMailApi):
             return []
         return result['messages']
 
-    def subj_possible_types(self, subj: str, trans_types: List[TransType]):
-        possible_types = []
-        for ttype in trans_types:
-            if re.search(self._bc.MAIL_SUBJ.get(ttype, '(?!x)x'), subj):
-                possible_types.append(ttype)
-        return possible_types
-
     def get_message_info(self, msg):
         msg_info = self._api.users().messages().get(userId='me', id=msg['id']).execute()
         result = {}
@@ -81,6 +74,13 @@ class GMailBankApi(GMailApi):
         result['Body'] = html.unescape(body)
         result['Date'] = parser.parse(result['Date']).replace(tzinfo=None)
         return result
+
+    def subj_possible_types(self, subj: str, trans_types: List[TransType]):
+        possible_types = []
+        for ttype in trans_types:
+            if re.search(self._bc.MAIL_SUBJ.get(ttype, '(?!x)x'), subj):
+                possible_types.append(ttype)
+        return possible_types
 
     def msg_to_transaction(self, msg_info, possible_types: List[TransType]) -> Transaction:
         for ttype in possible_types:
