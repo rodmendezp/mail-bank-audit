@@ -6,8 +6,6 @@ from mailbankdata.banks import bco_chile
 from mailbankdata.sources import GMailBankApi
 from mailbankdata import TransactionType as TransType
 
-CLS_PATH = 'mailbankdata.sources.gmail.GMailBankApi'
-
 
 class TestGMailBankApi(TestCase):
     @classmethod
