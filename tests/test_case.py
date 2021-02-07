@@ -17,7 +17,7 @@ class BankRegexTestCase(TestCase):
 
     @staticmethod
     def make_test_function(ttype: TransType, ttype_file: str) -> Callable:
-        ttype_name = ttype._name_.lower()
+        ttype_name = ttype.name.lower()
 
         def test(self):
             print(f'[{self.bank_name}] test_{ttype_name}_regex')
@@ -42,7 +42,7 @@ class BankRegexTestCase(TestCase):
         cls._mail_regex = getattr(bank_module, 'MAIL_REGEX')
         for ttype, ttype_file in cls._trans_files:
             test_func = cls.make_test_function(ttype, ttype_file)
-            ttype_name = ttype._name_.lower()
+            ttype_name = ttype.name.lower()
             test_name = f'test_{ttype_name}_regex'
 
             setattr(cls, test_name, test_func)
@@ -52,7 +52,7 @@ class BankRegexTestCase(TestCase):
     def _get_transactions_files(cls) -> List[Tuple[TransType, str]]:
         result = []
         for ttype in TransType:
-            ttype_name = str(ttype._name_).lower()
+            ttype_name = str(ttype.name).lower()
             file_name = f'{ttype_name}.html'
             html_path = os.path.join(cls._resource_folder, cls.bank_name, file_name)
             if os.path.exists(html_path):
