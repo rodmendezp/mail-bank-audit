@@ -107,7 +107,8 @@ class GMailBankApi(GMailApi):
     def credit_transactions(self, st_date: date = None, end_date: date = None) -> List[Transaction]:
         trans_types = [
             TransType.NAT_CRED_PAY,
-            TransType.NAT_CRED_EXPENSE
+            TransType.NAT_CRED_EXPENSE,
+            TransType.NAT_CRED_WITHDRAW
         ]
         filters = self.generate_filters(self._bc.EMAIL, st_date, end_date)
         return self._get_transactions(filters, trans_types)
