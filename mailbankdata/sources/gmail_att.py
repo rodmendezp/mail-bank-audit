@@ -41,19 +41,10 @@ class GMailAttachmentBankApi(GMailBankApi):
         gmail_bank_api.__init__(gmail_api, bank)
         return gmail_bank_api
 
-    def _get_transactions(self, filters, trans_types: List[TransType]) -> List[Transaction]:
-        transactions = []
-        msg_info = self._api.users().messages().get(userId='me', id=self._msg_id).execute()
-        for part in msg_info['payload']['parts']:
-            if not part.get('filename', None):
-                continue
-            msg_subj, possible_types = part['filename'], []
-            for trans_type in trans_types:
-                if re.search(self._bc.MAIL_SUBJ.get(trans_type, '(?!x)x'), msg_subj):
-                    # Some subjects are very similar
-                    possible_types.append(trans_type)
-            if not possible_types:
-                # Subject does not match to any of transactions subjects
+    def get_messages(self, filters):
+        msg_attachment = self._api.users().messages().get(userId='me', id=self._msg_id).execute()
+        for part in msg_attachment['payload']['parts']:
+            if not part.get('filename'):
                 continue
             if 'data' in part['body']:
                 data = part['body']['data']
@@ -62,19 +53,17 @@ class GMailAttachmentBankApi(GMailBankApi):
                 attachment = self._api.users().messages().attachments().get(userId='me', messageId=self._msg_id, id=attachment_id).execute()
                 data = attachment['data']
             file_data = base64.urlsafe_b64decode(data)
-            # TODO: Get message body
             text = html.unescape(file_data.decode())
             mail_dtime = re.search(r'Date\: ([^\n]*)', text).group(1)
             mail_dtime = parser.parse(mail_dtime).replace(tzinfo=None)
-            for trans_type in possible_types:
-                mail_reg = self._bc.MAIL_REGEX[trans_type]
-                match = re.search(mail_reg, text, re.DOTALL)
-                if not match:
-                    continue
-                t = Transaction.from_match(match, mail_dtime, trans_type)
-                transactions.append(t)
-                break
-        return transactions
+            after, before = filters.get('after', date.min), filters.get('before', date.max)
+            if not after <= mail_dtime.date() < before:
+                continue
+            yield {'Subject': part['filename'], 'Date': mail_dtime, 'Body': text}
+        return
+
+    def get_message_info(self, msg):
+        return msg
 
     @staticmethod
     def generate_filters(from_: str, st_date: date, end_date: date) -> Dict[str, Any]:
