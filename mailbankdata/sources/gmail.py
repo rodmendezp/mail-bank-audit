@@ -3,9 +3,9 @@ import html
 import base64
 import pickle
 import importlib
-from typing import List
 from datetime import date
 from dateutil import parser
+from typing import List, Optional
 from mailbankdata.banks import Bank
 from mailbankdata.core import Transaction
 from googleapiclient.discovery import build
@@ -75,14 +75,14 @@ class GMailBankApi(GMailApi):
         result['Date'] = parser.parse(result['Date']).replace(tzinfo=None)
         return result
 
-    def subj_possible_types(self, subj: str, trans_types: List[TransType]):
+    def subj_possible_types(self, subj: str, trans_types: List[TransType]) -> List[TransType]:
         possible_types = []
         for ttype in trans_types:
             if re.search(self._bc.MAIL_SUBJ.get(ttype, '(?!x)x'), subj):
                 possible_types.append(ttype)
         return possible_types
 
-    def msg_to_transaction(self, msg_info, possible_types: List[TransType]) -> Transaction:
+    def msg_to_transaction(self, msg_info, possible_types: List[TransType]) -> Optional[Transaction]:
         for ttype in possible_types:
             mail_reg = self._bc.MAIL_REGEX[ttype]
             match = re.search(mail_reg, msg_info['Body'], re.DOTALL)
@@ -92,9 +92,9 @@ class GMailBankApi(GMailApi):
         # It may happen when subjects are the same for different ttype
         return None
 
-    def _get_transactions(self, filter, trans_types: List[TransType]) -> List[Transaction]:
+    def _get_transactions(self, filters, trans_types: List[TransType]) -> List[Transaction]:
         transactions = []
-        for msg in self.get_messages(filter):
+        for msg in self.get_messages(filters):
             msg_info = self.get_message_info(msg)
             possible_types = self.subj_possible_types(msg_info['Subject'], trans_types)
             if not possible_types:
