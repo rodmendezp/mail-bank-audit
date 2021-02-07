@@ -89,7 +89,8 @@ class GMailBankApi(GMailApi):
             if not match:
                 continue
             return Transaction.from_match(match, msg_info['Date'], ttype)
-        raise Exception('Body does not match to any regex')
+        # It may happen when subjects are the same for different ttype
+        return None
 
     def _get_transactions(self, filter, trans_types: List[TransType]) -> List[Transaction]:
         transactions = []
@@ -98,7 +99,9 @@ class GMailBankApi(GMailApi):
             possible_types = self.subj_possible_types(msg_info['Subject'], trans_types)
             if not possible_types:
                 continue
-            transactions.append(self.msg_to_transaction(msg_info, possible_types))
+            transaction = self.msg_to_transaction(msg_info, possible_types)
+            if transaction:
+                transactions.append(transaction)
         return transactions
 
     def all_transactions(self, st_date: date = None, end_date: date = None) -> List[Transaction]:
