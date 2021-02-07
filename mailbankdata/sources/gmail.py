@@ -55,37 +55,50 @@ class GMailBankApi(GMailApi):
         gmail_bank_api.__init__(gmail_api, bank)
         return gmail_bank_api
 
-    def _get_transactions(self, gmail_filter: str, trans_types: List[TransType]) -> List[Transaction]:
-        transactions = []
-        result = self._api.users().messages().list(userId='me', q=gmail_filter).execute()
+    def get_messages(self, filters):
+        result = self._api.users().messages().list(userId='me', q=filters).execute()
         if result['resultSizeEstimate'] == 0:
-            return transactions
-        messages = result['messages']
-        for msg in messages:
-            msg_info = self._api.users().messages().get(userId='me', id=msg['id']).execute()
-            msg_subj = next(x['value'] for x in msg_info['payload']['headers'] if x['name'] == 'Subject')
-            possible_types = []
-            for trans_type in trans_types:
-                if re.search(self._bc.MAIL_SUBJ.get(trans_type, '(?!x)x'), msg_subj):
-                    # Some subjects are very similar
-                    possible_types.append(trans_type)
-            if not possible_types:
-                # Subject does not match to any of transactions subjects
+            return []
+        return result['messages']
+
+    def subj_possible_types(self, subj: str, trans_types: List[TransType]):
+        possible_types = []
+        for ttype in trans_types:
+            if re.search(self._bc.MAIL_SUBJ.get(ttype, '(?!x)x'), subj):
+                possible_types.append(ttype)
+        return possible_types
+
+    def get_message_info(self, msg):
+        msg_info = self._api.users().messages().get(userId='me', id=msg['id']).execute()
+        result = {}
+        for x in msg_info['payload']['headers']:
+            if x['name'] == 'Subject' or x['name'] == 'Date':
+                result[x['name']] = x['value']
+        if msg_info['payload']['body']['size'] > 0:
+            body = base64.urlsafe_b64decode(msg_info['payload']['body']['data']).decode()
+        else:
+            body = base64.urlsafe_b64decode(msg_info['payload']['parts'][0]['body']['data']).decode()
+        result['Body'] = html.unescape(body)
+        result['Date'] = parser.parse(result['Date']).replace(tzinfo=None)
+        return result
+
+    def msg_to_transaction(self, msg_info, possible_types: List[TransType]) -> Transaction:
+        for ttype in possible_types:
+            mail_reg = self._bc.MAIL_REGEX[ttype]
+            match = re.search(mail_reg, msg_info['Body'], re.DOTALL)
+            if not match:
                 continue
-            if msg_info['payload']['body']['size'] > 0:
-                text = base64.urlsafe_b64decode(msg_info['payload']['body']['data']).decode()
-            else:
-                text = base64.urlsafe_b64decode(msg_info['payload']['parts'][0]['body']['data']).decode()
-            text = html.unescape(text)
-            mail_dtime = next(x['value'] for x in msg_info['payload']['headers'] if x['name'] == 'Date')
-            mail_dtime = parser.parse(mail_dtime).replace(tzinfo=None)
-            for trans_type in possible_types:
-                mail_reg = self._bc.MAIL_REGEX[trans_type]
-                match = re.search(mail_reg, text, re.DOTALL)
-                if match:
-                    t = Transaction.from_match(match, mail_dtime, trans_type)
-                    transactions.append(t)
-                    break
+            return Transaction.from_match(match, msg_info['Date'], ttype)
+        raise Exception('Body does not match to any regex')
+
+    def _get_transactions(self, filter, trans_types: List[TransType]) -> List[Transaction]:
+        transactions = []
+        for msg in self.get_messages(filter):
+            msg_info = self.get_message_info(msg)
+            possible_types = self.subj_possible_types(msg_info['Subject'], trans_types)
+            if not possible_types:
+                continue
+            transactions.append(self.msg_to_transaction(msg_info, possible_types))
         return transactions
 
     def all_transactions(self, st_date: date = None, end_date: date = None) -> List[Transaction]:
