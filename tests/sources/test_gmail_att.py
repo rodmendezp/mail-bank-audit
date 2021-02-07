@@ -1,7 +1,7 @@
 from datetime import date
 from unittest import TestCase
 from mailbankdata.banks import bco_chile
-from mailbankdata.sources.gmail_att import GMailAttachmentBankApi
+from mailbankdata.sources import GMailAttachmentBankApi
 
 
 class TestGMailAttachmentBankApi(TestCase):
@@ -10,4 +10,4 @@ class TestGMailAttachmentBankApi(TestCase):
         filters = GMailAttachmentBankApi.generate_filters(bco_chile.EMAIL, st_date, end_date)
         expected = {'from': bco_chile.EMAIL, 'after': st_date, 'before': end_date}
         self.assertEqual(filters, expected)
-    pass
+
