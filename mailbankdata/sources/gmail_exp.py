@@ -7,11 +7,10 @@ from datetime import date
 from dateutil import parser
 from typing import List, Dict, Any
 from mailbankdata.banks import Bank
-from mailbankdata.core import Transaction
-from mailbankdata.core.constants import TransactionType as TransType
+from mailbankdata.sources import GMailBankApi
 
 
-class GMailExportBankApi:
+class GMailExportBankApi(GMailBankApi):
     def __init__(self, zip_file: str, bank: Bank) -> None:
         self._bank = bank
         self._zip_file = zip_file
@@ -23,38 +22,23 @@ class GMailExportBankApi:
         mbox_zip_file_path = next(x for x in zip_obj.namelist() if x.endswith('.mbox'))
         self.mbox_file = zip_obj.extract(mbox_zip_file_path)
 
-    def _get_transactions(self, filters, trans_types: List[TransType]) -> List[Transaction]:
-        transactions = []
-        for msg in mailbox.mbox(self.mbox_file):
-            if not self.pass_filters(msg, filters):
-                continue
-            msg_subj = email.header.decode_header(msg['subject'])[0][0]
-            if isinstance(msg_subj, bytes):
-                msg_subj = msg_subj.decode()
-            trans_type = next((t for t in trans_types if re.search(self._bc.MAIL_SUBJ[t], msg_subj)), None)
-            if not trans_type:
-                # Subject does not match to any of transactions subjects
-                continue
-            mail_reg = self._bc.MAIL_REGEX[trans_type]
-            if msg.is_multipart():
-                text = ''.join(part.get_payload(decode=True).decode() for part in msg.get_payload())
-            else:
-                text = msg.get_payload(decode=True).decode()
-            match = re.search(mail_reg, text, re.DOTALL)
-            if not match:
-                # Mail's body does not contain regex
-                continue
-            mail_dtime = next(x[1] for x in msg._headers if x[0] == 'Date')
-            mail_dtime = parser.parse(mail_dtime).replace(tzinfo=None)
-            t = Transaction.from_match(match, mail_dtime, trans_type)
-            transactions.append(t)
-        return transactions
+    def get_messages(self, filters):
+        return filter(lambda x: self.pass_filters(x, filters), mailbox.mbox(self.mbox_file))
+
+    def get_message_info(self, msg):
+        mail_dtime = next(parser.parse(x[1]).replace(tzinfo=None) for x in msg._headers if x[0] == 'Date')
+        subject = email.header.decode_header(msg['subject'])[0][0]
+        if isinstance(subject, bytes):
+            subject = subject.decode()
+        if msg.is_multipart():
+            body = ''.join(part.get_payload(decode=True).decode() for part in msg.get_payload())
+        else:
+            body = msg.get_payload(decode=True).decode()
+        return {'Date': mail_dtime, 'Subject': subject, 'Body': body}
 
     @staticmethod
     def generate_filters(from_: str, st_date: date, end_date: date) -> Dict[str, Any]:
-        filters = {
-            'from': from_,
-        }
+        filters = {'from': from_}
         if st_date:
             filters['after'] = st_date
         if end_date:
