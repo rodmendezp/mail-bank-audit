@@ -50,25 +50,6 @@ class GMailExportBankApi:
             transactions.append(t)
         return transactions
 
-    def check_transactions(self, st_date: date = None, end_date: date = None) -> List[Transaction]:
-        trans_types = [
-            TransType.NAT_CRED_PAY,
-            TransType.INT_CRED_PAY,
-            TransType.CHECK_TRANSFER,
-            TransType.CHECK_EXPENSE,
-            TransType.CHECK_WITHDRAW,
-        ]
-        filters = self.generate_filters(self._bc.EMAIL, st_date, end_date)
-        return self._get_transactions(filters, trans_types)
-
-    def credit_transactions(self, st_date: date = None, end_date: date = None) -> List[Transaction]:
-        trans_types = [
-            TransType.NAT_CRED_PAY,
-            TransType.NAT_CRED_EXPENSE
-        ]
-        filters = self.generate_filters(self._bc.EMAIL, st_date, end_date)
-        return self._get_transactions(filters, trans_types)
-
     @staticmethod
     def generate_filters(from_: str, st_date: date, end_date: date) -> Dict[str, Any]:
         filters = {
