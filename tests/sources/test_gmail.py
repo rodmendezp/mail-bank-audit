@@ -1,8 +1,10 @@
+import base64
 from datetime import date
+from dateutil import parser
 from unittest import TestCase
-from unittest.mock import patch
 from mailbankdata.banks import Bank
 from mailbankdata.banks import bco_chile
+from unittest.mock import patch, MagicMock
 from mailbankdata.sources import GMailBankApi
 from mailbankdata import TransactionType as TransType
 
@@ -60,3 +62,45 @@ class TestGMailBankApi(TestCase):
         filters = GMailBankApi.generate_filters(bco_chile.EMAIL, st_date, end_date)
         expected = self.str_filter
         self.assertEqual(filters, expected)
+        
+    def test_get_message_info(self):
+        def mock_get(userId: str, id: int):
+            return mock_api
+
+        body = 'Hello World!'
+        msg_date = 'Wed, 14 Mar 2018 15:06:46 -0300 (CLT)'
+        msg_info = {
+            'payload': {
+                'headers': [
+                    {
+                        'name': 'Subject',
+                        'value': 'Notificacion de Compra',
+                    },
+                    {
+                        'name': 'Date',
+                        'value': msg_date,
+                    }
+                ],
+                'body': {'size': 0},
+                'parts': [{
+                    'partId': 0,
+                    'mimeType': 'text/html',
+                    'headers': {},
+                    'body': {
+                        'size': len(body),
+                        'data': base64.urlsafe_b64encode(body.encode())
+                    }
+                }]
+            }
+        }
+        msg = {'id': 12345}
+        mock_api = MagicMock()
+        mock_api.users = lambda: mock_api
+        mock_api.messages = lambda: mock_api
+        mock_api.get = mock_get
+        mock_api.execute = lambda: msg_info
+        gmail_bank_api = GMailBankApi(mock_api, Bank.BCO_CHILE)
+        result = gmail_bank_api.get_message_info(msg)
+        self.assertEqual(result['Subject'], 'Notificacion de Compra')
+        self.assertEqual(result['Date'], parser.parse(msg_date).replace(tzinfo=None))
+        self.assertEqual(result['Body'], body)
