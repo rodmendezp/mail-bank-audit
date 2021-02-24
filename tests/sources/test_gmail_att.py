@@ -1,5 +1,7 @@
+import base64
+from typing import Dict
 from datetime import date
-from typing import Dict, Any
+from dateutil import parser
 from unittest import TestCase
 from unittest.mock import MagicMock
 from mailbankdata.banks import bco_chile, Bank
@@ -62,3 +64,33 @@ class TestGMailAttachmentBankApi(TestCase):
         gmail_api = GMailAttachmentBankApi(mock_api, Bank.BCO_CHILE, 123456)
         self.assertEqual(gmail_api._get_message_id('somesubj'), msg_id)
 
+    def test_get_message_info(self):
+        msg = {}
+        gmail_api = GMailAttachmentBankApi(None, Bank.BCO_CHILE, 123456)
+        self.assertIs(gmail_api.get_message_info(msg), msg)
+
+    def test_get_messages(self):
+        filters = {}
+        msg_date = 'Wed, 14 Mar 2018 15:06:46 -0300 (CLT)'
+        body = f'Date: {msg_date}\nHello World!'
+        subject = 'Notificacion de Compra',
+        result = {
+            'payload': {
+                'parts': [
+                    {
+                        'filename': subject,
+                        'body': {
+                            'size': len(body),
+                            'data': base64.urlsafe_b64encode(body.encode())
+                        }
+                    }
+                ]
+            }
+        }
+        mock_api = self.get_mock_api(result)
+        gmail_api = GMailAttachmentBankApi(mock_api, Bank.BCO_CHILE, 123456)
+        messages = list(gmail_api.get_messages(filters))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(messages[0]['Subject'], subject)
+        self.assertEqual(messages[0]['Body'], body)
+        self.assertEqual(messages[0]['Date'], parser.parse(msg_date).replace(tzinfo=None))
