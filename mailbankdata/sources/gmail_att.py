@@ -27,20 +27,6 @@ class GMailAttachmentBankApi(GMailBankApi):
             raise Exception(f'Subject {msg_subj} needs to be unique, {msg_count} mails match this subject')
         return result['messages'][0]['id']
 
-    @classmethod
-    def from_creds_json(cls, creds_path: str, bank: Bank) -> 'GMailAttachmentBankApi':
-        gmail_api = super().api_from_creds_json(creds_path)
-        gmail_bank_api = cls.__new__(cls)
-        gmail_bank_api.__init__(gmail_api, bank)
-        return gmail_bank_api
-
-    @classmethod
-    def from_token_pickle(cls, token_path: str, bank: Bank) -> 'GMailAttachmentBankApi':
-        gmail_api = super().api_from_token_pickle(token_path)
-        gmail_bank_api = cls.__new__(cls)
-        gmail_bank_api.__init__(gmail_api, bank)
-        return gmail_bank_api
-
     def get_messages(self, filters):
         msg_attachment = self._api.users().messages().get(userId='me', id=self._msg_id).execute()
         for part in msg_attachment['payload']['parts']:
